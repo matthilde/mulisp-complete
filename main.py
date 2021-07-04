@@ -240,6 +240,9 @@ cumiler = lambda ast, name = "<toplevel>", fargs = [], bytecode = None, argcount
     code_type(argcount, 0, 0, nlocals[0], max(required_stacksize) + 5, int(coro)*128, bytes(bytecode), tuple(consts), tuple(names), tuple(fargs), "gaming", name, 1, b"", (), ())
 )[-1]
 
+new_globals = lambda glob: {**predefs, **glob}
+eval_lisp = lambda code, globals: eval(code, globals)
+
 fold = lambda f, acc, stuff: [(acc:=f(acc, x)) for x in stuff][-1]
 predefs = {
     "+": lambda *args: fold(lambda x,y:x+y, args[0], args[1:]),
@@ -265,6 +268,7 @@ predefs = {
     "tail": lambda l: l[1:],
     "last": lambda l: l[-1],
     "nth": lambda l, i: l[i],
+    "fold": fold,
     "is-matthilde-cute": lambda: True,  # :pout: # :poutback:
     "cons": dataclass(
         type("cons", (object,), 
@@ -276,8 +280,7 @@ predefs = {
     "false": False, # :galaxybrain:
     "nil": None
 }   
-new_globals = lambda glob: {**predefs, **glob}
-eval_lisp = lambda code, globals: eval(code, globals)
+
 
 # TODO: delet this
 compile_lisp = lambda code: cumiler(parse_lisp(code))
